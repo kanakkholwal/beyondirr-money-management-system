@@ -1,8 +1,8 @@
 "use server";
-import { Schema } from 'mongoose';
 
 import dbConnect from "@/lib/dbConnect";
 import Event from "@/models/event";
+import { revalidatePath } from "next/cache";
 
 
 export async function getEvent(eventId: string) {
@@ -19,25 +19,23 @@ export async function getEvent(eventId: string) {
     }
 }
 
-export async function sendContribution(eventId: string, amount: number) {
+export async function closeEvent(eventId: string) {
     try {
         await dbConnect();
-        const userOrGuestId = "123" as unknown as Schema.Types.ObjectId;
 
         const event = await Event.findById(eventId);
         if (!event) {
             return Promise.reject({ message: 'Event not found', data: null });
         }
 
-        event.contributions.push({
-            amount,
-            contributorId: userOrGuestId
-        });
+        event.isClosed = true;
         await event.save();
-        return Promise.resolve({ message: 'Contribution sent', data: true });
+        revalidatePath(`/dashboard/events/${eventId}`);
+        revalidatePath(`/events/${eventId}`);
+        return Promise.resolve({ message: 'Event closed', data: true });
     }
     catch (error) {
         console.log(error);
-        return Promise.reject({ message: 'Failed to send contribution', data: null });
+        return Promise.reject({ message: 'Failed to close event', data: null });
     }
 }

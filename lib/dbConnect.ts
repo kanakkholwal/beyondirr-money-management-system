@@ -21,7 +21,7 @@ if (!cached) {
     cached = global.mongoose = { conn: null, promise: null };
 }
 const defaultDb =
-    process.env.NODE_ENV === "production" ? "production" : "development";
+    process.env.NODE_ENV === "production" ? "assignment_production" : "assignment_development";
 
 async function dbConnect(dbName: string = defaultDb): Promise<Mongoose> {
     if (cached.conn) {
@@ -31,6 +31,7 @@ async function dbConnect(dbName: string = defaultDb): Promise<Mongoose> {
     if (!cached.promise) {
         const opts: ConnectOptions = {
             dbName,
+            connectTimeoutMS: 15000,
         };
 
         try {

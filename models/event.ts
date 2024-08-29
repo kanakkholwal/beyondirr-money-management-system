@@ -3,11 +3,13 @@ import mongoose, { Document, Model, Schema } from 'mongoose';
 interface Guest {
     name: string;
     email: string;
-    phoneNumber: string;
+    mobileNo: string;
+    city: string;
+    guestId: Schema.Types.ObjectId | null;
 }
 
 interface EventDocument extends Document {
-    eventName: string;
+    name: string;
     date: Date;
     venue: string;
     hostId: Schema.Types.ObjectId;
@@ -15,14 +17,30 @@ interface EventDocument extends Document {
     isClosed: boolean;
     contributions: {
         amount: number;
-        contributorId: Schema.Types.ObjectId;
+        contributorId: string;
+    }[];
+}
+
+export interface EventJSON {
+    _id: string;
+    name: string;
+    date: Date;
+    venue: string;
+    hostId: string;
+    guests: Guest[];
+    isClosed: boolean;
+    contributions: {
+        amount: number;
+        contributorId: string;
     }[];
 }
 
 const GuestSchema = new Schema<Guest>({
     name: { type: String, required: true },
-    email: { type: String, required: true },
-    phoneNumber: { type: String, required: true }
+    email: { type: String, unique: true, sparse: true },
+    mobileNo: { type: String, unique: true, sparse: true },
+    city: { type: String},
+    guestId: { type: Schema.Types.ObjectId, ref: 'User', sparse: true }
 });
 
 const ContributionSchema = new Schema({
@@ -31,7 +49,7 @@ const ContributionSchema = new Schema({
 });
 
 const EventSchema = new Schema<EventDocument>({
-    eventName: { type: String, required: true },
+    name: { type: String, required: true },
     date: { type: Date, required: true },
     venue: { type: String, required: true },
     hostId: { type: Schema.Types.ObjectId, ref: 'User', required: true },

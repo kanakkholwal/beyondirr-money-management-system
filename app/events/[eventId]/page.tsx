@@ -7,30 +7,32 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { CalendarDays, MapPin } from 'lucide-react';
+import { getSession } from "@/lib/auth";
+import { CalendarDays, MapPin, Plus } from 'lucide-react';
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEvent, sendContribution } from "./actions";
 import ContributeButton from "./contributeButton";
 
-const event = {
-    _id: "123",
-    name: "Sample Event",
-    venue: "Sample Venue",
-    date: "2024-12-31",
-    isClosed: false,
-}
+
 
 export default async function EventPage({ params }: { params: { eventId: string } }) {
-    const _event = await getEvent(params.eventId);
-
+    const event = await getEvent(params.eventId);
+    
     if (!event) {
         notFound();
     }
+    const session = await getSession();
 
 
     return (
         <Card>
             <CardHeader>
+                <Button className="max-w-16" size="sm" variant="link" asChild>
+                    <Link href="/">
+                        Home
+                    </Link>
+                </Button>
                 <CardTitle>{event.name}</CardTitle>
                 <CardDescription className="text-gray-600">
                     <MapPin className="size-4 mr-2 inline-block" />
@@ -41,14 +43,15 @@ export default async function EventPage({ params }: { params: { eventId: string 
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                {event.isClosed ? (<>
-                    <p className="text-gray-600">Event is closed</p>
+                {(event.isClosed || session?.user._id === event.hostId) ? (<>
+                    <p className="text-gray-600 mb-4">
+                        {session?.user._id === event.hostId ? "You are the host of this event" : "This event is closed"}
+                    </p>
                     <Button disabled>
-                        Contribute
+                        <Plus className="size-4 mr-2 inline-block" />
+                        Add Contribution
                     </Button>
-                </>) : (<>
-                    <ContributeButton sendContribution={sendContribution.bind(null, params.eventId)} />
-                </>)}
+                </>) : (<ContributeButton sendContribution={sendContribution.bind(null, params.eventId)} />)}
             </CardContent>
         </Card>
 

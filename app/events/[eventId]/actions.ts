@@ -1,8 +1,10 @@
 "use server";
-import { Schema } from 'mongoose';
 
+import { getSession } from '@/lib/auth';
 import dbConnect from "@/lib/dbConnect";
 import Event from "@/models/event";
+import { revalidatePath } from 'next/cache';
+
 
 
 export async function getEvent(eventId: string) {
@@ -20,8 +22,11 @@ export async function getEvent(eventId: string) {
 
 export async function sendContribution(eventId: string, amount: number) {
     try {
+        const session = await getSession();
+        if (!session) {
+            return Promise.reject({ message: 'User not authenticated', data: null });
+        }
         await dbConnect();
-        const userOrGuestId = "123" as unknown as Schema.Types.ObjectId;
 
         const event = await Event.findById(eventId);
         if (!event) {
@@ -30,9 +35,12 @@ export async function sendContribution(eventId: string, amount: number) {
 
         event.contributions.push({
             amount,
-            contributorId: userOrGuestId
+            contributorId: session.user._id
+            // contributorId: new mongoose.Types.ObjectId(session.user._id) 
         });
         await event.save();
+        revalidatePath(`/dashboard`);
+        revalidatePath(`/dashboard/events/${eventId}`);
         return Promise.resolve({ message: 'Contribution sent', data: true });
     }
     catch (error) {
