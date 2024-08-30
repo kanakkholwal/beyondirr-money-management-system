@@ -11,14 +11,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IndianRupee } from 'lucide-react';
 import Link from "next/link";
 
-import { getAnalytics, getEvents, getGifts } from './actions';
+import { Badge } from "@/components/ui/badge";
+import { getAnalytics, getEvents, getGifts,getTopGuestsAndHosts } from './actions';
 
 export default async function DashboardPage() {
     const { receivedContributions, contributions } = await getAnalytics();
     const events = await getEvents();
     const gifts = await getGifts();
+    const {topGuests, topHosts } = await getTopGuestsAndHosts();
 
-    console.log(gifts);
 
     return <>
         <div className="flex justify-between gap-4">
@@ -90,11 +91,54 @@ export default async function DashboardPage() {
                     </TabsList>
                     <TabsContent value="received">
                         {gifts["received"].length === 0 && <h4 className="text-red-500 text-center">No gifts received</h4>}
-                        {gifts["received"].map((contribution) => <GiftCard key={contribution._id} contribution={contribution} />)}
+                        {gifts["received"].map((contribution) => <ReceivedCard key={contribution._id} contribution={contribution} />)}
                     </TabsContent>
                     <TabsContent value="contributed">
                         {gifts["contributed"].length === 0 && <h4 className="text-red-500 text-center">No gifts contributed</h4>}
-                        {gifts["contributed"].map((contribution) => <GiftCard key={contribution._id} contribution={contribution} />)}
+                        {gifts["contributed"].map((contribution) => <ContributeCard key={contribution._id} contribution={contribution} />)}
+                    </TabsContent>
+                </Tabs>
+
+            </CardContent>
+        </Card>
+        <Card className="mt-10">
+            <CardHeader className="flex-row flex justify-between">
+                <CardTitle className="text-2xl">topGuests</CardTitle>
+            </CardHeader>
+
+            <CardContent>
+                <Tabs defaultValue="topGuests" className="w-full">
+                    <TabsList>
+                        <TabsTrigger value="topGuests">
+                        topGuests
+                        </TabsTrigger>
+                        <TabsTrigger value="topHosts">topHosts</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="topGuests">
+                        {topGuests.length === 0 && <h4 className="text-red-500 text-center">No topGuests found</h4>}
+                        {topGuests.map((guest) => {
+                            return <Card key={guest._id}>
+                                <CardHeader>
+                                    <CardTitle>{guest.name}</CardTitle>
+                                    <CardDescription>{guest.email}</CardDescription>
+                                    <Badge>{guest.totalAmount}</Badge>
+
+                                </CardHeader>
+                            </Card>
+                        })}
+                        
+                    </TabsContent>
+                    <TabsContent value="topHosts">
+                        {topHosts.length === 0 && <h4 className="text-red-500 text-center">No topHosts found</h4>}
+                        {topHosts.map((host) => {
+                            return <Card key={host._id}>
+                                <CardHeader>
+                                    <CardTitle>{host.name}</CardTitle>
+                                    <CardDescription>{host.email}</CardDescription>
+                                    <Badge>{host.totalAmount}</Badge>
+                                </CardHeader>
+                            </Card>
+                        })}
                     </TabsContent>
                 </Tabs>
 
@@ -104,28 +148,55 @@ export default async function DashboardPage() {
     </>
 }
 
-function GiftCard({ contribution }:{
+function ReceivedCard({ contribution }: {
     contribution: {
         _id: string;
-        name: string;
+        event: string;
         amount: number;
-        createdAt: string;
+        contributor: {
+            name: string;
+            email: string;
+            mobileNo: string;
+        }
     }
 }) {
-    
+
     return (
         <Card className="mb-4">
             <CardHeader>
-                <CardTitle>{contribution.name}</CardTitle>
-                <CardDescription>{new Date(contribution.createdAt).toLocaleString()}</CardDescription>
+                <CardTitle>{contribution.event}</CardTitle>
+                <CardDescription>
+                    <Badge>{contribution.amount}</Badge>
+                    {" "} by <span className="font-bold">{contribution.contributor.name}</span>
+
+                </CardDescription>
             </CardHeader>
-            <CardContent>
-                <div className="flex gap-4 items-center">
-                    <div>
-                        <CardDescription>{contribution.amount}</CardDescription>
-                    </div>
-                </div>
-            </CardContent>
+        </Card>
+    )
+
+}
+function ContributeCard({ contribution }: {
+    contribution: {
+        _id: string;
+
+        event: string;
+        amount: number;
+        contributor: {
+            name: string;
+            email: string;
+            mobileNo: string;
+        }
+    }
+}) {
+
+    return (
+        <Card className="mb-4">
+            <CardHeader>
+                <CardTitle>{contribution.event}</CardTitle>
+                <CardDescription>
+                    <Badge>{contribution.amount}</Badge>
+                </CardDescription>
+            </CardHeader>
         </Card>
     )
 
