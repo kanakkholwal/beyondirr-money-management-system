@@ -52,7 +52,7 @@ export default function CreateEventForm() {
                 email: guest.email || "",
                 mobileNo: guest.mobileNo || "",
                 city: guest.city || "",
-                hostId:guest?._id || ""
+                guestId:guest?._id || ""
             })));
         }
         catch (error) {

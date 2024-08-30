@@ -7,12 +7,16 @@ import { rawUserType } from "./schema";
 export async function registerUser(data: rawUserType) {
     try {
         await dbConnect();
+
+
         const userExists = await User.findOne({
             $or: [
                 { email: data.email },
-                { mobileNo: data.mobileNo },
+                // (data.mobileNo?.trim().length === 10 ? { mobileNo: data.mobileNo } : {})
             ],
         });
+console.log(userExists)
+
         if (userExists) {
             return Promise.reject({
                 status: 409,

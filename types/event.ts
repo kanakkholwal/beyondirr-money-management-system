@@ -18,7 +18,7 @@ export const rawEventSchema = z.object({
             mobileNo: z.string().min(10, { message: "Mobile number must be exactly 10 digits long" })
                 .max(10, { message: "Mobile number must be exactly 10 digits long" })
                 .or(z.string().max(0)).optional(),
-            hostId: z.string().optional().nullable(),
+            guestId: z.string().optional().nullable(),
         }).refine(data => data.email || data.mobileNo, {
             message: "Guest must have either an email or a phone number",
             path: ["email", "mobileNo"],

@@ -1,4 +1,4 @@
-import { Body, Button, Container, Head, Heading, Html, Preview, Text } from '@react-email/components';
+import { Body, Button, Container, Head, Heading, Html, Preview, render, Text } from '@react-email/components';
 import React from 'react';
 
 interface InviteEmailProps {
@@ -44,7 +44,13 @@ export const InviteEmail: React.FC<InviteEmailProps> = ({
     );
 };
 
-export default InviteEmail;
+
+export const getInviteEmailHTML = (data:InviteEmailProps) =>{
+    const emailHtml = render(<InviteEmail {...data}/>);
+    
+    return emailHtml;
+}
+
 
 const main = {
     backgroundColor: '#f4f4f4',

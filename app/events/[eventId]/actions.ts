@@ -20,12 +20,17 @@ export async function getEvent(eventId: string) {
     }
 }
 
-export async function sendContribution(eventId: string, amount: number) {
+export async function sendContribution(eventId: string, data: {
+    amount: number;
+    data:{
+        name: string;
+        city: string;
+        mobileNo: string;
+        email: string;
+    } | string;
+}) {
     try {
         const session = await getSession();
-        if (!session) {
-            return Promise.reject({ message: 'User not authenticated', data: null });
-        }
         await dbConnect();
 
         const event = await Event.findById(eventId);
@@ -34,9 +39,10 @@ export async function sendContribution(eventId: string, amount: number) {
         }
 
         event.contributions.push({
-            amount,
-            contributorId: session.user._id
-            // contributorId: new mongoose.Types.ObjectId(session.user._id) 
+            amount:data.amount,
+            // contributor: data.data
+            contributor: session?.user?._id ? session.user._id : data.data 
+            // contributor: new mongoose.Types.ObjectId(session.user._id) 
         });
         await event.save();
         revalidatePath(`/dashboard`);

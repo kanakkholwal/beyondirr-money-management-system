@@ -1,4 +1,5 @@
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -13,12 +14,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEvent } from "./actions";
 
-import { closeEvent } from './actions';
+import { addContribution, closeEvent } from './actions';
+import AddContributeButton from './addContribution';
 import CloseContributionButton from './closeEvent';
 
 export default async function EventPage({ params }: { params: { eventId: string } }) {
     const event = await getEvent(params.eventId);
-    
+
     if (!event) {
         notFound();
     }
@@ -33,20 +35,25 @@ export default async function EventPage({ params }: { params: { eventId: string 
                         Home
                     </Link>
                 </Button>
-                <CardTitle>{event.name}</CardTitle>
-                <CardDescription className="text-gray-600">
-                    <MapPin className="size-4 mr-2 inline-block" />
-                    {event.venue}
-                    {`  `}
-                    <CalendarDays className="size-4 mx-2 inline-block" />
-                    {new Date(event.date).toLocaleDateString()}
+                <CardTitle>
+                    {event.name}
+                    <Badge variant={event.isClosed ? 'destructive' : 'default'} className="ml-2">
+                        {event.isClosed ? 'Closed' : 'Open'}
+                    </Badge>
+                </CardTitle>
+                <CardDescription  className="text-gray-600">
+                        <MapPin className="size-4 mr-2 inline-block" />
+                        {event.venue}
+                        {`  `}
+                        <CalendarDays className="size-4 mx-2 inline-block" />
+                        {new Date(event.date).toLocaleDateString()}
                 </CardDescription>
-                <div className="mt-5">
-                    <CloseContributionButton closeContribution={closeEvent.bind(null, params.eventId)} isClosed={event.isClosed}/>
-                </div>
             </CardHeader>
             <CardContent>
-                
+                <div className="flex gap-4 items-center">
+                    <CloseContributionButton closeContribution={closeEvent.bind(null, params.eventId)} isClosed={event.isClosed} />
+                    <AddContributeButton addContribution={addContribution.bind(null, params.eventId)} />
+                </div>
             </CardContent>
         </Card>
 

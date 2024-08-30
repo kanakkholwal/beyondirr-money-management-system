@@ -33,7 +33,7 @@ export async function getAnalytics() {
         const contributions = await Event.aggregate([
             {
                 $match: {
-                    'contributions.contributorId': new mongoose.Types.ObjectId(session.user._id) // Corrected to ObjectId type
+                    'contributions.contributor': new mongoose.Types.ObjectId(session.user._id) // Corrected to ObjectId type
                 }
             },
             {
@@ -57,7 +57,7 @@ export async function getAnalytics() {
     }
 }
 
-export async function getGifts(){
+export async function getGifts() {
     try {
         const session = await getSession();
         if (!session) {
@@ -65,9 +65,78 @@ export async function getGifts(){
         }
         await dbConnect();
 
-        const sentGifts = await Event.find({
-            
-        })
+        const received_contributions = await Event.aggregate([
+            {
+                $match: {
+                    hostId: new mongoose.Types.ObjectId(session.user._id)
+                }
+            },
+            {
+                $unwind: '$contributions'
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'contributions.contributor',
+                    foreignField: '_id',
+                    as: 'contributorDetails'
+                }
+            },
+            {
+                $unwind: '$contributorDetails'
+            },
+            {
+                $addFields: {
+                    'contributions.contributor': '$contributorDetails'
+                }
+            },
+            {
+                $project: {
+                    contributorDetails: 0 // Exclude the temporary field used for lookup
+                }
+            }
+        ]);
+
+        const contributed_contributions = await Event.aggregate([
+            {
+                $match: {
+                    $or: [
+                        { 'contributions.contributor': new mongoose.Types.ObjectId(session.user._id) },
+                        { 'contributions.contributor.email': session.user.email },
+                        { 'contributions.contributor.mobileNo': session.user.mobileNo }
+                    ]
+                }
+            },
+            {
+                $unwind: '$contributions'
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'contributions.contributor',
+                    foreignField: '_id',
+                    as: 'contributorDetails'
+                }
+            },
+            {
+                $unwind: '$contributorDetails'
+            },
+            {
+                $addFields: {
+                    'contributions.contributor': '$contributorDetails'
+                }
+            },
+            {
+                $project: {
+                    contributorDetails: 0 // Exclude the temporary field used for lookup
+                }
+            }
+        ]);
+
+        return Promise.resolve({
+            received: received_contributions || [],
+            contributed: contributed_contributions || []
+        });
 
     } catch (error) {
         console.log(error);
@@ -76,7 +145,7 @@ export async function getGifts(){
 }
 
 
-export async function getEvents() : Promise<EventJSON[]> {
+export async function getEvents(): Promise<EventJSON[]> {
     try {
         const session = await getSession();
         if (!session) {

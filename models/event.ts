@@ -17,7 +17,12 @@ interface EventDocument extends Document {
     isClosed: boolean;
     contributions: {
         amount: number;
-        contributorId: string;
+        contributor: string | {
+            name: string;
+            email: string;
+            mobileNo: string;
+            city: string;
+        }
     }[];
 }
 
@@ -31,7 +36,12 @@ export interface EventJSON {
     isClosed: boolean;
     contributions: {
         amount: number;
-        contributorId: string;
+        contributor: string | {
+            name: string;
+            email: string;
+            mobileNo: string;
+            city: string;
+        }
     }[];
 }
 
@@ -45,7 +55,7 @@ const GuestSchema = new Schema<Guest>({
 
 const ContributionSchema = new Schema({
     amount: { type: Number, required: true },
-    contributorId: { type: Schema.Types.ObjectId, ref: 'User', required: true }
+    contributor: { type: Schema.Types.ObjectId, ref: 'User', required: true }
 });
 
 const EventSchema = new Schema<EventDocument>({

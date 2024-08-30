@@ -1,13 +1,13 @@
 "use server";
-
-// import { handleEmailFire } from "@/emails/helper";
-// import { InviteEmail } from "@/emails/invite-template";
+import { InviteEmail } from "@/emails/invite-template";
 import { getSession } from "@/lib/auth";
 import dbConnect from "@/lib/dbConnect";
 import Event from "@/models/event";
 import User from "@/models/user";
 import { rawEventType } from "@/types/event";
-// import { render } from '@react-email/components';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function createEvent(eventData: rawEventType) {
     try {
@@ -20,20 +20,24 @@ export async function createEvent(eventData: rawEventType) {
             ...eventData,
             hostId: session.user!._id,
         });
+
+
+        const { data, error } = await resend.emails.send({
+            from: `Event Invitation <send@nexonauts.com>`,
+            to: event.guests.filter(guest => guest.email).map(guest => guest.email),
+            subject: 'Event Invitation',
+            react: InviteEmail({ name: event.name, hostName: session.user!.name, date: event.date.toISOString(), venue: event.venue, 
+                inviteLink: `${process.env.NEXTAUTH_URL}/events/${event._id}` 
+            })
+        });
+
+        if (error) {
+            console.log(error);
+            return Promise.reject(error);
+        }
+
         await event.save();
 
-        // const emailHtml = await render(<InviteEmail
-        //     name={event.name}
-        //     hostName={session.user!.name}
-        //     date={event.date.toISOString()}
-        //     venue={event.venue}
-        // />);
-
-        // await handleEmailFire(`Event Invitation <${session.user?.email ? session.user.email :"no_reply@giftapp.com"}>`, {
-        //     to: event.guests.filter(guest => guest.email).map(guest => guest.email).join(','),
-        //     subject: `🌟 Event Invitation🌟`,
-        //     html: emailHtml,
-        // });
         return Promise.resolve(JSON.parse(JSON.stringify(event)));
     }
     catch (error) {

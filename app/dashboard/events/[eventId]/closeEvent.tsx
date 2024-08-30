@@ -11,15 +11,15 @@ interface CloseContributionButtonProps {
 export default function CloseContributionButton({ closeContribution,isClosed }: CloseContributionButtonProps) {
 
     return (<>
-        <Button size="sm" disabled={isClosed} onClick={() => {
+        <Button size="sm" onClick={() => {
             toast.promise(closeContribution(), {
-                loading: 'Closing Contribution...',
-                success: 'Contribution Closed',
-                error: 'Failed to close contribution'
+                loading: isClosed ? 'Opening Contribution' : 'Closing Contribution',
+                success: isClosed ? 'Contribution opened' : 'Contribution closed',
+                error: isClosed ? 'Failed to open contribution' : 'Failed to close contribution'
             });
 
         }}>
-            {isClosed ? 'Closed' : 'Close Contribution'}
+            {isClosed ? "Open Contribution" : "Close Contribution"}
         </Button>
     </>
     )
