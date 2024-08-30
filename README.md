@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+## Money Gift Management Web Application
 
-First, run the development server:
+Money Gift Management Web Application is a web-based platform that enables users to manage events and track gift contributions. Users can create events, invite guests, manage contributions, and view analytics for their events. The platform supports user authentication, dynamic dashboards, and data visualization.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Features
+- User Account Creation: Users can create an account using either an email or a mobile number.
+- Event Creation and Guest Management: Users can create events, add guests, and send email invitations.
+- Gift Contribution Management: Hosts can add gift contributions from guests and manage them through a dynamic dashboard.
+- Guest Contribution: Guests can contribute to events through an online payment option.
+- Event Closure: Hosts can close the event, preventing further contributions.
+- Analytics Dashboard: View contributions received and made, along with top contributors and hosts.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Tech Stack
+- Frontend & Backend: Next.js, TypeScript
+- Database: MongoDB with Mongoos
+- Authentication : Nextauth.js
+- Email Service: Resend
 
-## Learn More
+### Screenshots:
 
-To learn more about Next.js, take a look at the following resources:
+#### Dashboard
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+![image](https://github.com/user-attachments/assets/31e6b7a2-b358-4a76-954e-6f8bdb82fc28)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+#### CReate Event Page
 
-## Deploy on Vercel
+![image](https://github.com/user-attachments/assets/2cf85cbc-ffbf-4d6d-8d9b-238f235d0c5e)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### Host Event Page View
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+![image](https://github.com/user-attachments/assets/5bd91d06-726d-4039-a294-8fa8c821a015)
+
+#### Guest Event Page View
+
+![image](https://github.com/user-attachments/assets/b0170b0f-acca-42bc-aa69-2e4ba2944dde)
+
+#### Guest Event Invitation Mail
+
+![image](https://github.com/user-attachments/assets/fa2a3b4e-9c65-4754-8584-9f4edfa5a375)
+
